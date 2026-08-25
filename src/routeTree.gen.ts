@@ -10,33 +10,132 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAdvogadosRouteImport } from './routes/_authenticated/advogados'
+import { Route as AuthenticatedBuscaRouteImport } from './routes/_authenticated/busca'
+import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
+import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
+import { Route as AuthenticatedProcessosIndexRouteImport } from './routes/_authenticated/processos.index'
+import { Route as AuthenticatedProcessosProcessoIdRouteImport } from './routes/_authenticated/processos.$processoId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdvogadosRoute = AuthenticatedAdvogadosRouteImport.update({
+  id: '/advogados',
+  path: '/advogados',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBuscaRoute = AuthenticatedBuscaRouteImport.update({
+  id: '/busca',
+  path: '/busca',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedClientesRoute = AuthenticatedClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProcessosIndexRoute =
+  AuthenticatedProcessosIndexRouteImport.update({
+    id: '/processos/',
+    path: '/processos/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProcessosProcessoIdRoute =
+  AuthenticatedProcessosProcessoIdRouteImport.update({
+    id: '/processos/$processoId',
+    path: '/processos/$processoId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/advogados': typeof AuthenticatedAdvogadosRoute
+  '/busca': typeof AuthenticatedBuscaRoute
+  '/clientes': typeof AuthenticatedClientesRoute
+  '/painel': typeof AuthenticatedPainelRoute
+  '/processos/$processoId': typeof AuthenticatedProcessosProcessoIdRoute
+  '/processos/': typeof AuthenticatedProcessosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/advogados': typeof AuthenticatedAdvogadosRoute
+  '/busca': typeof AuthenticatedBuscaRoute
+  '/clientes': typeof AuthenticatedClientesRoute
+  '/painel': typeof AuthenticatedPainelRoute
+  '/processos/$processoId': typeof AuthenticatedProcessosProcessoIdRoute
+  '/processos': typeof AuthenticatedProcessosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/advogados': typeof AuthenticatedAdvogadosRoute
+  '/_authenticated/busca': typeof AuthenticatedBuscaRoute
+  '/_authenticated/clientes': typeof AuthenticatedClientesRoute
+  '/_authenticated/painel': typeof AuthenticatedPainelRoute
+  '/_authenticated/processos/$processoId': typeof AuthenticatedProcessosProcessoIdRoute
+  '/_authenticated/processos/': typeof AuthenticatedProcessosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/advogados'
+    | '/busca'
+    | '/clientes'
+    | '/painel'
+    | '/processos/$processoId'
+    | '/processos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/advogados'
+    | '/busca'
+    | '/clientes'
+    | '/painel'
+    | '/processos/$processoId'
+    | '/processos'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/advogados'
+    | '/_authenticated/busca'
+    | '/_authenticated/clientes'
+    | '/_authenticated/painel'
+    | '/_authenticated/processos/$processoId'
+    | '/_authenticated/processos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +147,90 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/advogados': {
+      id: '/_authenticated/advogados'
+      path: '/advogados'
+      fullPath: '/advogados'
+      preLoaderRoute: typeof AuthenticatedAdvogadosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/busca': {
+      id: '/_authenticated/busca'
+      path: '/busca'
+      fullPath: '/busca'
+      preLoaderRoute: typeof AuthenticatedBuscaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/clientes': {
+      id: '/_authenticated/clientes'
+      path: '/clientes'
+      fullPath: '/clientes'
+      preLoaderRoute: typeof AuthenticatedClientesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/painel': {
+      id: '/_authenticated/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof AuthenticatedPainelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/processos/': {
+      id: '/_authenticated/processos/'
+      path: '/processos'
+      fullPath: '/processos/'
+      preLoaderRoute: typeof AuthenticatedProcessosIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/processos/$processoId': {
+      id: '/_authenticated/processos/$processoId'
+      path: '/processos/$processoId'
+      fullPath: '/processos/$processoId'
+      preLoaderRoute: typeof AuthenticatedProcessosProcessoIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdvogadosRoute: typeof AuthenticatedAdvogadosRoute
+  AuthenticatedBuscaRoute: typeof AuthenticatedBuscaRoute
+  AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
+  AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
+  AuthenticatedProcessosProcessoIdRoute: typeof AuthenticatedProcessosProcessoIdRoute
+  AuthenticatedProcessosIndexRoute: typeof AuthenticatedProcessosIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdvogadosRoute: AuthenticatedAdvogadosRoute,
+  AuthenticatedBuscaRoute: AuthenticatedBuscaRoute,
+  AuthenticatedClientesRoute: AuthenticatedClientesRoute,
+  AuthenticatedPainelRoute: AuthenticatedPainelRoute,
+  AuthenticatedProcessosProcessoIdRoute: AuthenticatedProcessosProcessoIdRoute,
+  AuthenticatedProcessosIndexRoute: AuthenticatedProcessosIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
