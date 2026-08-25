@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdvogadosRouteImport } from './routes/_authenticated/advogados'
+import { Route as AuthenticatedBuscaRouteImport } from './routes/_authenticated/busca'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedProcessosIndexRouteImport } from './routes/_authenticated/processos.index'
@@ -35,6 +36,11 @@ const AuthRoute = AuthRouteImport.update({
 const AuthenticatedAdvogadosRoute = AuthenticatedAdvogadosRouteImport.update({
   id: '/advogados',
   path: '/advogados',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBuscaRoute = AuthenticatedBuscaRouteImport.update({
+  id: '/busca',
+  path: '/busca',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedClientesRoute = AuthenticatedClientesRouteImport.update({
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/advogados': typeof AuthenticatedAdvogadosRoute
+  '/busca': typeof AuthenticatedBuscaRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/processos/$processoId': typeof AuthenticatedProcessosProcessoIdRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/advogados': typeof AuthenticatedAdvogadosRoute
+  '/busca': typeof AuthenticatedBuscaRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/processos/$processoId': typeof AuthenticatedProcessosProcessoIdRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/advogados': typeof AuthenticatedAdvogadosRoute
+  '/_authenticated/busca': typeof AuthenticatedBuscaRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/processos/$processoId': typeof AuthenticatedProcessosProcessoIdRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/advogados'
+    | '/busca'
     | '/clientes'
     | '/painel'
     | '/processos/$processoId'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/advogados'
+    | '/busca'
     | '/clientes'
     | '/painel'
     | '/processos/$processoId'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/advogados'
+    | '/_authenticated/busca'
     | '/_authenticated/clientes'
     | '/_authenticated/painel'
     | '/_authenticated/processos/$processoId'
@@ -156,6 +168,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdvogadosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/busca': {
+      id: '/_authenticated/busca'
+      path: '/busca'
+      fullPath: '/busca'
+      preLoaderRoute: typeof AuthenticatedBuscaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/clientes': {
       id: '/_authenticated/clientes'
       path: '/clientes'
@@ -189,6 +208,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdvogadosRoute: typeof AuthenticatedAdvogadosRoute
+  AuthenticatedBuscaRoute: typeof AuthenticatedBuscaRoute
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedProcessosProcessoIdRoute: typeof AuthenticatedProcessosProcessoIdRoute
@@ -197,6 +217,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdvogadosRoute: AuthenticatedAdvogadosRoute,
+  AuthenticatedBuscaRoute: AuthenticatedBuscaRoute,
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedProcessosProcessoIdRoute: AuthenticatedProcessosProcessoIdRoute,
