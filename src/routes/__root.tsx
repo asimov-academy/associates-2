@@ -78,11 +78,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Asimov Associates — Gestão de processos" },
+      {
+        name: "description",
+        content: "Sistema interno do escritório Asimov Associates para processos e prazos.",
+      },
+      { name: "author", content: "Asimov Associates" },
+      { property: "og:title", content: "Asimov Associates — Gestão de processos" },
+      {
+        property: "og:description",
+        content: "Sistema interno do escritório Asimov Associates para processos e prazos.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
