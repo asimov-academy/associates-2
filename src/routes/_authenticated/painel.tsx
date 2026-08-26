@@ -7,9 +7,10 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { listarProcessos } from "@/lib/queries";
 import { prazoUrgente, type Processo } from "@/lib/domain";
-import { useEhAdvogado } from "@/hooks/useSessao";
+import { useEhAdvogado, usePerfilAtual } from "@/hooks/useSessao";
 import { AppShell } from "@/components/AppShell";
 import { ProcessoCard } from "@/components/ProcessoCard";
+import { AgendaAdvogado } from "@/components/AgendaAdvogado";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/painel")({
@@ -37,6 +38,7 @@ export const Route = createFileRoute("/_authenticated/painel")({
 function Painel() {
   const queryClient = useQueryClient();
   const ehAdvogado = useEhAdvogado();
+  const { data: perfil } = usePerfilAtual();
   const { data: processos = [], isLoading } = useQuery({
     queryKey: ["processos"],
     queryFn: listarProcessos,
@@ -111,6 +113,12 @@ function Painel() {
           </ul>
         </div>
       </div>
+
+      {perfil?.papel === "advogado" ? (
+        <div className="mt-8">
+          <AgendaAdvogado perfil={perfil} />
+        </div>
+      ) : null}
 
       <div className="mt-8 space-y-4">
         {isLoading ? (

@@ -53,6 +53,45 @@ export interface Profile {
   oab: string | null;
   area_atuacao: string | null;
   papel: Papel;
+  google_agenda: string | null;
+}
+
+/**
+ * Aceita o ID da agenda (e-mail), um link de compartilhamento do Google Agenda
+ * ou um endereço de incorporação e devolve a URL pronta para o iframe.
+ */
+export function urlAgendaGoogle(valor: string | null | undefined): string | null {
+  const bruto = (valor ?? "").trim();
+  if (!bruto) return null;
+
+  let id = bruto;
+  if (/^https?:\/\//i.test(bruto)) {
+    try {
+      const url = new URL(bruto);
+      if (url.pathname.includes("/calendar/embed")) return bruto;
+      const src = url.searchParams.get("src") || url.searchParams.get("cid");
+      if (src) {
+        id = src;
+      } else {
+        const partes = url.pathname.split("/").filter(Boolean);
+        id = decodeURIComponent(partes[partes.length - 1] ?? "");
+      }
+    } catch {
+      return null;
+    }
+  }
+
+  if (!id) return null;
+  const params = new URLSearchParams({
+    src: id,
+    ctz: "America/Sao_Paulo",
+    mode: "AGENDA",
+    showTitle: "0",
+    showPrint: "0",
+    showCalendars: "0",
+    showTz: "0",
+  });
+  return `https://calendar.google.com/calendar/embed?${params.toString()}`;
 }
 
 export interface Cliente {

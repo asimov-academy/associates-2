@@ -64,6 +64,7 @@ const VAZIO = {
   oab: "",
   area_atuacao: AREAS_ATUACAO[0] as string,
   papel: "advogado" as Papel,
+  google_agenda: "",
 };
 
 function AdvogadosPage() {
@@ -93,6 +94,7 @@ function AdvogadosPage() {
       oab: perfil.oab ?? "",
       area_atuacao: perfil.area_atuacao ?? AREAS_ATUACAO[0],
       papel: perfil.papel,
+      google_agenda: perfil.google_agenda ?? "",
     });
     setAberto(true);
   }
@@ -106,6 +108,8 @@ function AdvogadosPage() {
       oab: form.papel === "advogado" ? form.oab.trim() || null : null,
       area_atuacao: form.papel === "advogado" ? form.area_atuacao : null,
       papel: form.papel,
+      google_agenda:
+        form.papel === "advogado" ? form.google_agenda.trim() || null : null,
     };
     const { error } = editando
       ? await supabase.from("profiles").update(payload).eq("id", editando.id)
@@ -271,6 +275,23 @@ function AdvogadosPage() {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+            ) : null}
+            {form.papel === "advogado" ? (
+              <div className="space-y-2">
+                <Label htmlFor="google_agenda">Agenda do Google</Label>
+                <Input
+                  id="google_agenda"
+                  maxLength={400}
+                  placeholder="advogado@escritorio.com.br ou link da agenda"
+                  value={form.google_agenda}
+                  onChange={(e) => setForm({ ...form, google_agenda: e.target.value })}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Cole o ID (e-mail) da agenda ou o link de compartilhamento. No Google Agenda:
+                  Configurações da agenda → Integrar agenda. A agenda precisa estar compartilhada
+                  publicamente para aparecer no painel.
+                </p>
               </div>
             ) : null}
             <div className="space-y-2">
