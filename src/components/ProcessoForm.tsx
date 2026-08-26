@@ -106,6 +106,8 @@ export function validarProcesso(form: FormState): Erros {
 export function ProcessoForm({ processo }: { processo: Processo | null }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { data: perfil, isLoading: carregandoPerfil } = usePerfilAtual();
+  const ehAdvogado = perfil?.papel === "advogado";
   const [form, setForm] = useState<FormState>(VAZIO);
   const [erros, setErros] = useState<Erros>({});
   const [salvando, setSalvando] = useState(false);
