@@ -99,6 +99,10 @@ function DetalheProcesso() {
     queryFn: () => listarAnexosDasMovimentacoes(idsMov),
     enabled: idsMov.length > 0,
   });
+  const { data: historicoProcesso = [] } = useQuery({
+    queryKey: ["historico-processo", processoId],
+    queryFn: () => listarHistoricoProcesso(processoId),
+  });
 
   function invalidarTudo() {
     queryClient.invalidateQueries({ queryKey: ["processo", processoId] });
@@ -107,6 +111,24 @@ function DetalheProcesso() {
     queryClient.invalidateQueries({ queryKey: ["anexos-processo", processoId] });
     queryClient.invalidateQueries({ queryKey: ["anexos-movimentacoes"] });
     queryClient.invalidateQueries({ queryKey: ["historico-movimentacoes", processoId] });
+    queryClient.invalidateQueries({ queryKey: ["historico-processo", processoId] });
+  }
+
+  function baixarPdf() {
+    if (!processo) return;
+    try {
+      gerarPdfProcesso({
+        processo,
+        movimentacoes,
+        anexosProcesso,
+        anexosMovimentacoes: anexosMov,
+      });
+      toast.success("PDF gerado", { description: "O download começou automaticamente." });
+    } catch (erro) {
+      toast.error("Não foi possível gerar o PDF", {
+        description: erro instanceof Error ? erro.message : undefined,
+      });
+    }
   }
 
   async function excluirProcesso() {
