@@ -3,6 +3,7 @@ import type {
   Anexo,
   Cliente,
   HistoricoMovimentacao,
+  HistoricoProcesso,
   Movimentacao,
   Processo,
   Profile,
