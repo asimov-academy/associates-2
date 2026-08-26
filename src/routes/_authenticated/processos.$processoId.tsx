@@ -391,30 +391,37 @@ function LinhaDoTempo({
         alteração, a data/hora e o conteúdo anterior.
       </p>
 
-      <form onSubmit={registrar} className="mt-4 space-y-3 rounded-md bg-muted/40 p-4">
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="space-y-1">
-            <Label htmlFor="mov-data">Data</Label>
-            <Input
-              id="mov-data"
-              type="date"
-              value={data}
-              onChange={(e) => setData(e.target.value)}
-              className="w-44"
-            />
+      {podeEditar ? (
+        <form onSubmit={registrar} className="mt-4 space-y-3 rounded-md bg-muted/40 p-4">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="mov-data">Data</Label>
+              <Input
+                id="mov-data"
+                type="date"
+                value={data}
+                onChange={(e) => setData(e.target.value)}
+                className="w-44"
+              />
+            </div>
           </div>
-        </div>
-        <Textarea
-          rows={3}
-          maxLength={2000}
-          placeholder="Descreva a movimentação do processo…"
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
-        />
-        <Button type="submit" size="sm" disabled={salvando}>
-          Registrar movimentação
-        </Button>
-      </form>
+          <Textarea
+            rows={3}
+            maxLength={2000}
+            placeholder="Descreva a movimentação do processo…"
+            value={descricao}
+            onChange={(e) => setDescricao(e.target.value)}
+          />
+          <Button type="submit" size="sm" disabled={salvando}>
+            Registrar movimentação
+          </Button>
+        </form>
+      ) : (
+        <p className="mt-4 flex items-center gap-2 rounded-md bg-muted/40 p-4 text-sm text-muted-foreground">
+          <Lock className="h-4 w-4" /> Acesso somente para consulta: a secretaria não registra nem
+          edita movimentações.
+        </p>
+      )}
 
       <ol className="mt-6 space-y-5 border-l border-border pl-6">
         {movimentacoes.length === 0 ? (
