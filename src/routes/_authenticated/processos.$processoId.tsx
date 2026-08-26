@@ -261,6 +261,7 @@ function LinhaDoTempo({
   const [salvando, setSalvando] = useState(false);
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [textoEdicao, setTextoEdicao] = useState("");
+  const [dataEdicao, setDataEdicao] = useState("");
 
   async function registrar(e: React.FormEvent) {
     e.preventDefault();
