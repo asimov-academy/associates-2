@@ -552,13 +552,13 @@ function AnexosLinha({
   anexos,
   movimentacaoId,
   autorId,
-  podeExcluir,
+  podeEditar,
   onMudou,
 }: {
   anexos: Anexo[];
   movimentacaoId: string;
   autorId: string | null;
-  podeExcluir: boolean;
+  podeEditar: boolean;
   onMudou: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -578,25 +578,29 @@ function AnexosLinha({
   return (
     <div className="mt-2 space-y-1">
       {anexos.map((a) => (
-        <ItemAnexo key={a.id} anexo={a} podeExcluir={podeExcluir} onMudou={onMudou} />
+        <ItemAnexo key={a.id} anexo={a} podeExcluir={podeEditar} onMudou={onMudou} />
       ))}
-      <input
-        ref={inputRef}
-        type="file"
-        className="hidden"
-        onChange={(e) => {
-          const arquivo = e.target.files?.[0];
-          if (arquivo) void enviar(arquivo);
-          e.target.value = "";
-        }}
-      />
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-      >
-        <Paperclip className="h-3 w-3" /> Anexar documento
-      </button>
+      {podeEditar ? (
+        <>
+          <input
+            ref={inputRef}
+            type="file"
+            className="hidden"
+            onChange={(e) => {
+              const arquivo = e.target.files?.[0];
+              if (arquivo) void enviar(arquivo);
+              e.target.value = "";
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+          >
+            <Paperclip className="h-3 w-3" /> Anexar documento
+          </button>
+        </>
+      ) : null}
     </div>
   );
 }
