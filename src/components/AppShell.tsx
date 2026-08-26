@@ -46,8 +46,8 @@ export function AppShell({
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <aside className="flex w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
+    <div className="flex h-screen overflow-hidden bg-background">
+      <aside className="flex h-screen w-64 shrink-0 flex-col overflow-y-auto border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
         <div className="border-b border-sidebar-border px-6 py-6">
           <p className="font-serif text-lg leading-tight font-semibold">Asimov</p>
           <p className="text-xs tracking-[0.18em] text-sidebar-foreground/60 uppercase">
