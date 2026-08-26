@@ -400,6 +400,7 @@ export type Database = {
           area_atuacao: string | null
           created_at: string
           email: string | null
+          google_agenda: string | null
           id: string
           nome: string
           oab: string | null
@@ -411,6 +412,7 @@ export type Database = {
           area_atuacao?: string | null
           created_at?: string
           email?: string | null
+          google_agenda?: string | null
           id?: string
           nome: string
           oab?: string | null
@@ -422,6 +424,7 @@ export type Database = {
           area_atuacao?: string | null
           created_at?: string
           email?: string | null
+          google_agenda?: string | null
           id?: string
           nome?: string
           oab?: string | null
