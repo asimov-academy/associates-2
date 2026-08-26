@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { listarClientes, listarPerfis } from "@/lib/queries";
+import { usePerfilAtual } from "@/hooks/useSessao";
 import {
   ACOES,
   FASES,
@@ -156,6 +157,12 @@ export function ProcessoForm({ processo }: { processo: Processo | null }) {
 
   async function salvar(e: React.FormEvent) {
     e.preventDefault();
+    if (!ehAdvogado) {
+      toast.error("Edição não permitida", {
+        description: "A secretaria tem acesso somente para consulta de processos.",
+      });
+      return;
+    }
     const encontrados = validarProcesso(form);
     setErros(encontrados);
     if (Object.keys(encontrados).length > 0) {
@@ -164,6 +171,7 @@ export function ProcessoForm({ processo }: { processo: Processo | null }) {
       });
       return;
     }
+
 
     setSalvando(true);
     try {
