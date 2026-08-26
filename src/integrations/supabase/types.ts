@@ -284,6 +284,60 @@ export type Database = {
           },
         ]
       }
+      processo_historico: {
+        Row: {
+          acao: string
+          alterado_em: string
+          alterado_por_id: string | null
+          campo: string | null
+          created_at: string
+          entidade: string
+          id: string
+          processo_id: string | null
+          valor_anterior: string | null
+          valor_novo: string | null
+        }
+        Insert: {
+          acao: string
+          alterado_em?: string
+          alterado_por_id?: string | null
+          campo?: string | null
+          created_at?: string
+          entidade: string
+          id?: string
+          processo_id?: string | null
+          valor_anterior?: string | null
+          valor_novo?: string | null
+        }
+        Update: {
+          acao?: string
+          alterado_em?: string
+          alterado_por_id?: string | null
+          campo?: string | null
+          created_at?: string
+          entidade?: string
+          id?: string
+          processo_id?: string | null
+          valor_anterior?: string | null
+          valor_novo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "processo_historico_alterado_por_id_fkey"
+            columns: ["alterado_por_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "processo_historico_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "processos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       processos: {
         Row: {
           acao: string
