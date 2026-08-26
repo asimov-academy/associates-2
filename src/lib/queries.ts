@@ -139,3 +139,13 @@ export async function listarHistoricoDoProcesso(
   if (error) throw error;
   return (data ?? []) as unknown as HistoricoMovimentacao[];
 }
+
+export async function listarHistoricoProcesso(processoId: string): Promise<HistoricoProcesso[]> {
+  const { data, error } = await supabase
+    .from("processo_historico")
+    .select("*, alterado_por:alterado_por_id(nome)")
+    .eq("processo_id", processoId)
+    .order("alterado_em", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as unknown as HistoricoProcesso[];
+}
