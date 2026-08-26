@@ -54,11 +54,29 @@ export function ProcessoCard({
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-1">
-          <Button variant="ghost" size="icon" aria-label="Editar processo" asChild>
-            <Link to="/processos/editar/$processoId" params={{ processoId: processo.id }}>
-              <Pencil className="h-4 w-4" />
-            </Link>
-          </Button>
+          {podeExcluir ? (
+            <Button variant="ghost" size="icon" aria-label="Editar processo" asChild>
+              <Link to="/processos/editar/$processoId" params={{ processoId: processo.id }}>
+                <Pencil className="h-4 w-4" />
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Edição permitida apenas a advogados"
+              title="Somente advogados podem editar processos"
+              className="opacity-50"
+              onClick={() =>
+                toast.error("Edição não permitida", {
+                  description:
+                    "A secretaria tem acesso somente para consulta. Peça a um advogado do escritório.",
+                })
+              }
+            >
+              <Lock className="h-4 w-4 text-muted-foreground" />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"

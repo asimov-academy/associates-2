@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { listarClientes, listarPerfis } from "@/lib/queries";
+import { usePerfilAtual } from "@/hooks/useSessao";
 import {
   ACOES,
   FASES,
@@ -106,6 +107,8 @@ export function validarProcesso(form: FormState): Erros {
 export function ProcessoForm({ processo }: { processo: Processo | null }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { data: perfil, isLoading: carregandoPerfil } = usePerfilAtual();
+  const ehAdvogado = perfil?.papel === "advogado";
   const [form, setForm] = useState<FormState>(VAZIO);
   const [erros, setErros] = useState<Erros>({});
   const [salvando, setSalvando] = useState(false);
@@ -154,6 +157,12 @@ export function ProcessoForm({ processo }: { processo: Processo | null }) {
 
   async function salvar(e: React.FormEvent) {
     e.preventDefault();
+    if (!ehAdvogado) {
+      toast.error("Edição não permitida", {
+        description: "A secretaria tem acesso somente para consulta de processos.",
+      });
+      return;
+    }
     const encontrados = validarProcesso(form);
     setErros(encontrados);
     if (Object.keys(encontrados).length > 0) {
@@ -162,6 +171,7 @@ export function ProcessoForm({ processo }: { processo: Processo | null }) {
       });
       return;
     }
+
 
     setSalvando(true);
     try {
@@ -230,8 +240,36 @@ export function ProcessoForm({ processo }: { processo: Processo | null }) {
     }
   }
 
+  if (carregandoPerfil) {
+    return <p className="text-sm text-muted-foreground">Carregando…</p>;
+  }
+
+  if (!ehAdvogado) {
+    return (
+      <div className="max-w-2xl space-y-4 rounded-lg border border-primary/40 bg-accent/50 p-6">
+        <h2 className="font-serif text-lg font-semibold">Acesso somente para consulta</h2>
+        <p className="text-sm text-muted-foreground">
+          Cadastro e edição de processos são exclusivos dos advogados do escritório. A secretaria
+          pode consultar todos os processos, movimentações e documentos, e gerar o PDF do processo.
+        </p>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() =>
+            processo
+              ? navigate({ to: "/processos/$processoId", params: { processoId: processo.id } })
+              : navigate({ to: "/processos" })
+          }
+        >
+          Voltar
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={salvar} noValidate className="max-w-4xl space-y-8">
+
       <section className="grid gap-4 rounded-lg border border-border bg-card p-6 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="numero">

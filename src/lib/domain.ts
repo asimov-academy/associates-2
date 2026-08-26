@@ -109,6 +109,43 @@ export interface HistoricoMovimentacao {
   alterado_por?: { nome: string } | null;
 }
 
+export interface HistoricoProcesso {
+  id: string;
+  processo_id: string | null;
+  entidade: string;
+  acao: string;
+  campo: string | null;
+  valor_anterior: string | null;
+  valor_novo: string | null;
+  alterado_em: string;
+  alterado_por?: { nome: string } | null;
+}
+
+export const ROTULOS_CAMPO_PROCESSO: Record<string, string> = {
+  tipo: "Tipo",
+  acao: "Ação",
+  vara: "Vara",
+  fase: "Fase",
+  instancia: "Instância",
+  data_inicial: "Data inicial",
+  data_final: "Data final",
+  concluido: "Concluído",
+  vencido: "Perdido / vencido",
+  valor_causa: "Valor da causa",
+  proximo_prazo: "Próximo prazo",
+  descricao: "Descrição",
+};
+
+/** Formata para leitura o valor cru guardado no histórico do processo. */
+export function formatarValorHistorico(campo: string | null, valor: string | null): string {
+  if (valor === null || valor === "") return "—";
+  if (campo === "concluido" || campo === "vencido") return valor === "true" ? "Sim" : "Não";
+  if (campo === "valor_causa") return formatarMoeda(valor);
+  if (campo && campo.startsWith("data")) return formatarData(valor);
+  if (campo === "proximo_prazo") return formatarData(valor);
+  return valor;
+}
+
 export interface Anexo {
   id: string;
   processo_id: string | null;

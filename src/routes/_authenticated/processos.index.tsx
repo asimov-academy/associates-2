@@ -82,11 +82,13 @@ function ProcessosPage() {
       titulo="Processos"
       descricao="Histórico completo de todos os processos do escritório."
       acoes={
-        <Button asChild>
-          <Link to="/processos/novo">
-            <Plus className="mr-2 h-4 w-4" /> Novo processo
-          </Link>
-        </Button>
+        ehAdvogado ? (
+          <Button asChild>
+            <Link to="/processos/novo">
+              <Plus className="mr-2 h-4 w-4" /> Novo processo
+            </Link>
+          </Button>
+        ) : null
       }
     >
       <div className="mb-6 flex flex-wrap gap-3">
