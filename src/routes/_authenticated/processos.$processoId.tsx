@@ -437,42 +437,31 @@ function LinhaDoTempo({
                 <span className="absolute top-1.5 -left-[29px] h-2.5 w-2.5 rounded-full bg-primary" />
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-sm font-medium">{formatarData(m.data)}</p>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Editar movimentação"
-                      onClick={() => {
-                        setEditandoId(m.id);
-                        setTextoEdicao(m.descricao);
-                        setDataEdicao(m.data);
-                      }}
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label={
-                        podeExcluir
-                          ? "Excluir movimentação"
-                          : "Exclusão permitida apenas a advogados"
-                      }
-                      title={
-                        podeExcluir
-                          ? "Excluir movimentação"
-                          : "Somente advogados podem excluir movimentações"
-                      }
-                      className={podeExcluir ? undefined : "opacity-50"}
-                      onClick={() => excluir(m.id)}
-                    >
-                      {podeExcluir ? (
+                  {podeEditar ? (
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Editar movimentação"
+                        onClick={() => {
+                          setEditandoId(m.id);
+                          setTextoEdicao(m.descricao);
+                          setDataEdicao(m.data);
+                        }}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Excluir movimentação"
+                        title="Excluir movimentação"
+                        onClick={() => excluir(m.id)}
+                      >
                         <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                      ) : (
-                        <Lock className="h-3.5 w-3.5 text-muted-foreground" />
-                      )}
-                    </Button>
-                  </div>
+                      </Button>
+                    </div>
+                  ) : null}
                 </div>
 
                 {editandoId === m.id ? (
