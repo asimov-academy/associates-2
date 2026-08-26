@@ -726,3 +726,49 @@ function PainelAnexos({
     </aside>
   );
 }
+
+function HistoricoDoProcesso({ registros }: { registros: HistoricoProcesso[] }) {
+  return (
+    <section className="rounded-lg border border-border bg-card p-6">
+      <h2 className="flex items-center gap-2 font-serif text-lg font-semibold">
+        <History className="h-4 w-4" /> Histórico do processo
+      </h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Toda alteração nos dados do processo e nos documentos fica registrada com autor e
+        data/hora.
+      </p>
+
+      {registros.length === 0 ? (
+        <p className="mt-4 text-sm text-muted-foreground">Nenhuma alteração registrada até agora.</p>
+      ) : (
+        <ul className="mt-4 space-y-3">
+          {registros.map((r) => (
+            <li key={r.id} className="rounded-md border border-border px-3 py-2 text-sm">
+              <p className="text-xs text-muted-foreground">
+                {r.alterado_por?.nome ?? "—"} · {formatarDataHora(r.alterado_em)}
+              </p>
+              {r.entidade === "anexo" ? (
+                <p className="mt-1">
+                  {r.acao === "criacao" ? "Documento anexado" : "Documento removido"}:{" "}
+                  <span className="font-medium">{r.valor_novo ?? r.valor_anterior ?? "—"}</span>
+                </p>
+              ) : r.acao === "criacao" ? (
+                <p className="mt-1">Processo cadastrado</p>
+              ) : (
+                <p className="mt-1">
+                  <span className="font-medium">
+                    {ROTULOS_CAMPO_PROCESSO[r.campo ?? ""] ?? r.campo}
+                  </span>
+                  : <span className="line-through text-muted-foreground">
+                    {formatarValorHistorico(r.campo, r.valor_anterior)}
+                  </span>{" "}
+                  → {formatarValorHistorico(r.campo, r.valor_novo)}
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
