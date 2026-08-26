@@ -1,7 +1,17 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
-import { ArrowLeft, Download, History, Lock, Paperclip, Pencil, Trash2, Upload } from "lucide-react";
+import {
+  ArrowLeft,
+  Download,
+  FileDown,
+  History,
+  Lock,
+  Paperclip,
+  Pencil,
+  Trash2,
+  Upload,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -11,20 +21,25 @@ import {
   listarAnexosDasMovimentacoes,
   listarAnexosDoProcesso,
   listarHistoricoDoProcesso,
+  listarHistoricoProcesso,
   listarMovimentacoes,
   obterProcesso,
   removerAnexo,
 } from "@/lib/queries";
 import {
+  ROTULOS_CAMPO_PROCESSO,
   formatarData,
   formatarDataHora,
   formatarMoeda,
+  formatarValorHistorico,
   prazoUrgente,
   resultadoProcesso,
   type Anexo,
   type HistoricoMovimentacao,
+  type HistoricoProcesso,
   type Movimentacao,
 } from "@/lib/domain";
+import { gerarPdfProcesso } from "@/lib/pdfProcesso";
 import { useEhAdvogado, usePerfilAtual } from "@/hooks/useSessao";
 import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
