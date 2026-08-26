@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -10,7 +10,6 @@ import { prazoUrgente, type Processo } from "@/lib/domain";
 import { useEhAdvogado } from "@/hooks/useSessao";
 import { AppShell } from "@/components/AppShell";
 import { ProcessoCard } from "@/components/ProcessoCard";
-import { ProcessoDialog } from "@/components/ProcessoDialog";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/painel")({
@@ -38,9 +37,6 @@ export const Route = createFileRoute("/_authenticated/painel")({
 function Painel() {
   const queryClient = useQueryClient();
   const ehAdvogado = useEhAdvogado();
-  const [dialogAberto, setDialogAberto] = useState(false);
-  const [emEdicao, setEmEdicao] = useState<Processo | null>(null);
-
   const { data: processos = [], isLoading } = useQuery({
     queryKey: ["processos"],
     queryFn: listarProcessos,
@@ -84,13 +80,10 @@ function Painel() {
       titulo="Painel do escritório"
       descricao="Processos ordenados pelo prazo mais próximo. Prazos em menos de 7 dias aparecem destacados."
       acoes={
-        <Button
-          onClick={() => {
-            setEmEdicao(null);
-            setDialogAberto(true);
-          }}
-        >
-          <Plus className="mr-2 h-4 w-4" /> Novo processo
+        <Button asChild>
+          <Link to="/processos/novo">
+            <Plus className="mr-2 h-4 w-4" /> Novo processo
+          </Link>
         </Button>
       }
     >
@@ -130,21 +123,11 @@ function Painel() {
               key={p.id}
               processo={p}
               podeExcluir={ehAdvogado}
-              onEditar={(proc) => {
-                setEmEdicao(proc);
-                setDialogAberto(true);
-              }}
               onExcluir={excluir}
             />
           ))
         )}
       </div>
-
-      <ProcessoDialog
-        aberto={dialogAberto}
-        processo={emEdicao}
-        onOpenChange={setDialogAberto}
-      />
     </AppShell>
   );
 }

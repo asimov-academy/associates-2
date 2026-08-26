@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
-import { ArrowLeft, Download, Paperclip, Pencil, Trash2, Upload } from "lucide-react";
+import { ArrowLeft, Download, History, Lock, Paperclip, Pencil, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +10,7 @@ import {
   enviarAnexo,
   listarAnexosDasMovimentacoes,
   listarAnexosDoProcesso,
+  listarHistoricoDoProcesso,
   listarMovimentacoes,
   obterProcesso,
   removerAnexo,
@@ -21,11 +22,11 @@ import {
   prazoUrgente,
   resultadoProcesso,
   type Anexo,
+  type HistoricoMovimentacao,
   type Movimentacao,
 } from "@/lib/domain";
 import { useEhAdvogado, usePerfilAtual } from "@/hooks/useSessao";
 import { AppShell } from "@/components/AppShell";
-import { ProcessoDialog } from "@/components/ProcessoDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,7 +61,6 @@ function DetalheProcesso() {
   const queryClient = useQueryClient();
   const ehAdvogado = useEhAdvogado();
   const { data: perfil } = usePerfilAtual();
-  const [editarAberto, setEditarAberto] = useState(false);
 
   const { data: processo, isLoading } = useQuery({
     queryKey: ["processo", processoId],
@@ -69,6 +69,10 @@ function DetalheProcesso() {
   const { data: movimentacoes = [] } = useQuery({
     queryKey: ["movimentacoes", processoId],
     queryFn: () => listarMovimentacoes(processoId),
+  });
+  const { data: historico = [] } = useQuery({
+    queryKey: ["historico-movimentacoes", processoId],
+    queryFn: () => listarHistoricoDoProcesso(processoId),
   });
   const { data: anexosProcesso = [] } = useQuery({
     queryKey: ["anexos-processo", processoId],
@@ -87,10 +91,18 @@ function DetalheProcesso() {
     queryClient.invalidateQueries({ queryKey: ["movimentacoes", processoId] });
     queryClient.invalidateQueries({ queryKey: ["anexos-processo", processoId] });
     queryClient.invalidateQueries({ queryKey: ["anexos-movimentacoes"] });
+    queryClient.invalidateQueries({ queryKey: ["historico-movimentacoes", processoId] });
   }
 
   async function excluirProcesso() {
     if (!processo) return;
+    if (!ehAdvogado) {
+      toast.error("Exclusão não permitida", {
+        description:
+          "Somente advogados podem excluir processos. Peça a um advogado do escritório.",
+      });
+      return;
+    }
     if (!window.confirm(`Excluir o processo nº ${processo.numero}? Esta ação é definitiva.`))
       return;
     const { error } = await supabase.from("processos").delete().eq("id", processo.id);
@@ -129,14 +141,23 @@ function DetalheProcesso() {
           <Button variant="outline" onClick={() => navigate({ to: "/processos" })}>
             <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
           </Button>
-          <Button variant="outline" onClick={() => setEditarAberto(true)}>
-            <Pencil className="mr-2 h-4 w-4" /> Editar
+          <Button variant="outline" asChild>
+            <Link to="/processos/editar/$processoId" params={{ processoId }}>
+              <Pencil className="mr-2 h-4 w-4" /> Editar
+            </Link>
           </Button>
-          {ehAdvogado ? (
-            <Button variant="destructive" onClick={excluirProcesso}>
-              <Trash2 className="mr-2 h-4 w-4" /> Excluir
-            </Button>
-          ) : null}
+          <Button
+            variant={ehAdvogado ? "destructive" : "outline"}
+            onClick={excluirProcesso}
+            title={ehAdvogado ? "Excluir processo" : "Somente advogados podem excluir processos"}
+          >
+            {ehAdvogado ? (
+              <Trash2 className="mr-2 h-4 w-4" />
+            ) : (
+              <Lock className="mr-2 h-4 w-4" />
+            )}
+            Excluir
+          </Button>
         </>
       }
     >
@@ -189,6 +210,7 @@ function DetalheProcesso() {
           <LinhaDoTempo
             processoId={processoId}
             movimentacoes={movimentacoes}
+            historico={historico}
             anexos={anexosMov}
             autorId={perfil?.id ?? null}
             podeExcluir={ehAdvogado}
@@ -204,12 +226,6 @@ function DetalheProcesso() {
           onMudou={invalidarTudo}
         />
       </div>
-
-      <ProcessoDialog
-        aberto={editarAberto}
-        processo={processo}
-        onOpenChange={setEditarAberto}
-      />
     </AppShell>
   );
 }
@@ -226,6 +242,7 @@ function Campo({ rotulo, valor }: { rotulo: string; valor: string }) {
 function LinhaDoTempo({
   processoId,
   movimentacoes,
+  historico,
   anexos,
   autorId,
   podeExcluir,
@@ -233,6 +250,7 @@ function LinhaDoTempo({
 }: {
   processoId: string;
   movimentacoes: Movimentacao[];
+  historico: HistoricoMovimentacao[];
   anexos: Anexo[];
   autorId: string | null;
   podeExcluir: boolean;
@@ -243,6 +261,7 @@ function LinhaDoTempo({
   const [salvando, setSalvando] = useState(false);
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [textoEdicao, setTextoEdicao] = useState("");
+  const [dataEdicao, setDataEdicao] = useState("");
 
   async function registrar(e: React.FormEvent) {
     e.preventDefault();
@@ -265,10 +284,16 @@ function LinhaDoTempo({
   }
 
   async function salvarEdicao(id: string) {
+    const texto = textoEdicao.trim();
+    if (!texto) {
+      toast.error("A descrição não pode ficar vazia");
+      return;
+    }
     const { error } = await supabase
       .from("movimentacoes")
       .update({
-        descricao: textoEdicao.trim(),
+        descricao: texto,
+        data: dataEdicao,
         alterado_por_id: autorId,
         alterado_em: new Date().toISOString(),
       })
@@ -279,10 +304,18 @@ function LinhaDoTempo({
     }
     setEditandoId(null);
     onMudou();
-    toast.success("Movimentação atualizada");
+    toast.success("Movimentação atualizada", {
+      description: "A versão anterior foi guardada no histórico de alterações.",
+    });
   }
 
   async function excluir(id: string) {
+    if (!podeExcluir) {
+      toast.error("Exclusão não permitida", {
+        description: "Somente advogados podem excluir movimentações.",
+      });
+      return;
+    }
     if (!window.confirm("Excluir esta movimentação?")) return;
     const { error } = await supabase.from("movimentacoes").delete().eq("id", id);
     if (error) {
@@ -293,11 +326,13 @@ function LinhaDoTempo({
     toast.success("Movimentação excluída");
   }
 
+
   return (
     <section className="rounded-lg border border-border bg-card p-6">
       <h2 className="font-serif text-lg font-semibold">Linha do tempo</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Cada movimentação registra automaticamente quem escreveu e quando.
+        Cada movimentação registra quem escreveu e quando. Ao editar, o sistema guarda o autor da
+        alteração, a data/hora e o conteúdo anterior.
       </p>
 
       <form onSubmit={registrar} className="mt-4 space-y-3 rounded-md bg-muted/40 p-4">
@@ -333,6 +368,7 @@ function LinhaDoTempo({
         ) : (
           movimentacoes.map((m) => {
             const doItem = anexos.filter((a) => a.movimentacao_id === m.id);
+            const versoes = historico.filter((h) => h.movimentacao_id === m.id);
             return (
               <li key={m.id} className="relative">
                 <span className="absolute top-1.5 -left-[29px] h-2.5 w-2.5 rounded-full bg-primary" />
@@ -346,27 +382,47 @@ function LinhaDoTempo({
                       onClick={() => {
                         setEditandoId(m.id);
                         setTextoEdicao(m.descricao);
+                        setDataEdicao(m.data);
                       }}
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
-                    {podeExcluir ? (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Excluir movimentação"
-                        onClick={() => excluir(m.id)}
-                      >
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={
+                        podeExcluir
+                          ? "Excluir movimentação"
+                          : "Exclusão permitida apenas a advogados"
+                      }
+                      title={
+                        podeExcluir
+                          ? "Excluir movimentação"
+                          : "Somente advogados podem excluir movimentações"
+                      }
+                      className={podeExcluir ? undefined : "opacity-50"}
+                      onClick={() => excluir(m.id)}
+                    >
+                      {podeExcluir ? (
                         <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                      </Button>
-                    ) : null}
+                      ) : (
+                        <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+                      )}
+                    </Button>
                   </div>
                 </div>
 
                 {editandoId === m.id ? (
                   <div className="mt-2 space-y-2">
+                    <Input
+                      type="date"
+                      className="w-44"
+                      value={dataEdicao}
+                      onChange={(e) => setDataEdicao(e.target.value)}
+                    />
                     <Textarea
                       rows={3}
+                      maxLength={2000}
                       value={textoEdicao}
                       onChange={(e) => setTextoEdicao(e.target.value)}
                     />
@@ -389,6 +445,39 @@ function LinhaDoTempo({
                     ? ` · editado por ${m.alterado_por?.nome ?? "—"} em ${formatarDataHora(m.alterado_em)}`
                     : ""}
                 </p>
+
+                {versoes.length > 0 ? (
+                  <details className="mt-2 rounded-md border border-border bg-muted/30 px-3 py-2">
+                    <summary className="flex cursor-pointer items-center gap-2 text-xs font-medium text-muted-foreground">
+                      <History className="h-3.5 w-3.5" />
+                      Histórico de alterações ({versoes.length})
+                    </summary>
+                    <ul className="mt-2 space-y-3">
+                      {versoes.map((h) => (
+                        <li key={h.id} className="border-l-2 border-border pl-3 text-xs">
+                          <p className="font-medium">
+                            {h.alterado_por?.nome ?? "—"} · {formatarDataHora(h.alterado_em)}
+                          </p>
+                          {h.data_anterior !== h.data_nova ? (
+                            <p className="mt-1 text-muted-foreground">
+                              Data: {formatarData(h.data_anterior)} → {formatarData(h.data_nova)}
+                            </p>
+                          ) : null}
+                          {h.descricao_anterior !== h.descricao_nova ? (
+                            <>
+                              <p className="mt-1 text-muted-foreground">Texto anterior:</p>
+                              <p className="whitespace-pre-line text-muted-foreground line-through">
+                                {h.descricao_anterior ?? "—"}
+                              </p>
+                              <p className="mt-1 text-muted-foreground">Texto novo:</p>
+                              <p className="whitespace-pre-line">{h.descricao_nova ?? "—"}</p>
+                            </>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : null}
 
                 <AnexosLinha
                   anexos={doItem}
