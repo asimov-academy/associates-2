@@ -88,7 +88,7 @@ export function AppShell({
         </div>
       </aside>
 
-      <main className="min-w-0 flex-1">
+      <main className="min-w-0 flex-1 overflow-y-auto">
         <header className="flex items-start justify-between gap-6 border-b border-border bg-card px-8 py-6">
           <div>
             <h1 className="font-serif text-2xl font-semibold">{titulo}</h1>
