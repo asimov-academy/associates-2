@@ -80,11 +80,13 @@ function Painel() {
       titulo="Painel do escritório"
       descricao="Processos ordenados pelo prazo mais próximo. Prazos em menos de 7 dias aparecem destacados."
       acoes={
-        <Button asChild>
-          <Link to="/processos/novo">
-            <Plus className="mr-2 h-4 w-4" /> Novo processo
-          </Link>
-        </Button>
+        ehAdvogado ? (
+          <Button asChild>
+            <Link to="/processos/novo">
+              <Plus className="mr-2 h-4 w-4" /> Novo processo
+            </Link>
+          </Button>
+        ) : null
       }
     >
       <div className="grid gap-4 md:grid-cols-4">

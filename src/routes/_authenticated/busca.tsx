@@ -265,9 +265,11 @@ export function BuscaPage() {
         {resultados.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             Nenhum processo encontrado.{" "}
-            <Link to="/processos/novo" className="text-primary underline">
-              Cadastrar novo processo
-            </Link>
+            {ehAdvogado ? (
+              <Link to="/processos/novo" className="text-primary underline">
+                Cadastrar novo processo
+              </Link>
+            ) : null}
           </p>
         ) : (
           resultados.map((p) => (
