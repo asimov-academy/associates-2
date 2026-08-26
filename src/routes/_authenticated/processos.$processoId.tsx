@@ -533,11 +533,12 @@ function LinhaDoTempo({
 
                 <AnexosLinha
                   anexos={doItem}
-                  podeExcluir={podeExcluir}
+                  podeEditar={podeEditar}
                   onMudou={onMudou}
                   movimentacaoId={m.id}
                   autorId={autorId}
                 />
+
               </li>
             );
           })
