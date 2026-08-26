@@ -331,7 +331,8 @@ function LinhaDoTempo({
     <section className="rounded-lg border border-border bg-card p-6">
       <h2 className="font-serif text-lg font-semibold">Linha do tempo</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Cada movimentação registra automaticamente quem escreveu e quando.
+        Cada movimentação registra quem escreveu e quando. Ao editar, o sistema guarda o autor da
+        alteração, a data/hora e o conteúdo anterior.
       </p>
 
       <form onSubmit={registrar} className="mt-4 space-y-3 rounded-md bg-muted/40 p-4">
