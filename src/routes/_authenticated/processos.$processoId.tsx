@@ -657,13 +657,13 @@ function PainelAnexos({
   anexos,
   processoId,
   autorId,
-  podeExcluir,
+  podeEditar,
   onMudou,
 }: {
   anexos: Anexo[];
   processoId: string;
   autorId: string | null;
-  podeExcluir: boolean;
+  podeEditar: boolean;
   onMudou: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -692,29 +692,37 @@ function PainelAnexos({
           <p className="text-sm text-muted-foreground">Nenhum documento anexado.</p>
         ) : (
           anexos.map((a) => (
-            <ItemAnexo key={a.id} anexo={a} podeExcluir={podeExcluir} onMudou={onMudou} />
+            <ItemAnexo key={a.id} anexo={a} podeExcluir={podeEditar} onMudou={onMudou} />
           ))
         )}
       </div>
-      <input
-        ref={inputRef}
-        type="file"
-        className="hidden"
-        onChange={(e) => {
-          const arquivo = e.target.files?.[0];
-          if (arquivo) void enviar(arquivo);
-          e.target.value = "";
-        }}
-      />
-      <Button
-        variant="outline"
-        size="sm"
-        className="mt-4 w-full"
-        disabled={enviando}
-        onClick={() => inputRef.current?.click()}
-      >
-        <Upload className="mr-2 h-4 w-4" /> Anexar documento
-      </Button>
+      {podeEditar ? (
+        <>
+          <input
+            ref={inputRef}
+            type="file"
+            className="hidden"
+            onChange={(e) => {
+              const arquivo = e.target.files?.[0];
+              if (arquivo) void enviar(arquivo);
+              e.target.value = "";
+            }}
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-4 w-full"
+            disabled={enviando}
+            onClick={() => inputRef.current?.click()}
+          >
+            <Upload className="mr-2 h-4 w-4" /> Anexar documento
+          </Button>
+        </>
+      ) : (
+        <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+          <Lock className="h-3.5 w-3.5" /> Somente advogados podem anexar ou excluir documentos.
+        </p>
+      )}
     </aside>
   );
 }
