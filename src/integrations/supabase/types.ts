@@ -108,6 +108,67 @@ export type Database = {
         }
         Relationships: []
       }
+      movimentacao_historico: {
+        Row: {
+          alterado_em: string
+          alterado_por_id: string | null
+          created_at: string
+          data_anterior: string | null
+          data_nova: string | null
+          descricao_anterior: string | null
+          descricao_nova: string | null
+          id: string
+          movimentacao_id: string
+          processo_id: string | null
+        }
+        Insert: {
+          alterado_em?: string
+          alterado_por_id?: string | null
+          created_at?: string
+          data_anterior?: string | null
+          data_nova?: string | null
+          descricao_anterior?: string | null
+          descricao_nova?: string | null
+          id?: string
+          movimentacao_id: string
+          processo_id?: string | null
+        }
+        Update: {
+          alterado_em?: string
+          alterado_por_id?: string | null
+          created_at?: string
+          data_anterior?: string | null
+          data_nova?: string | null
+          descricao_anterior?: string | null
+          descricao_nova?: string | null
+          id?: string
+          movimentacao_id?: string
+          processo_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "movimentacao_historico_alterado_por_id_fkey"
+            columns: ["alterado_por_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "movimentacao_historico_movimentacao_id_fkey"
+            columns: ["movimentacao_id"]
+            isOneToOne: false
+            referencedRelation: "movimentacoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "movimentacao_historico_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "processos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       movimentacoes: {
         Row: {
           alterado_em: string | null

@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { AlertTriangle, CalendarClock, Pencil, Trash2 } from "lucide-react";
+import { AlertTriangle, CalendarClock, Lock, Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,12 +24,10 @@ function textoPrazo(processo: Processo) {
 export function ProcessoCard({
   processo,
   podeExcluir,
-  onEditar,
   onExcluir,
 }: {
   processo: Processo;
   podeExcluir: boolean;
-  onEditar: (p: Processo) => void;
   onExcluir: (p: Processo) => void;
 }) {
   const urgente = prazoUrgente(processo);
@@ -55,24 +54,38 @@ export function ProcessoCard({
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-1">
+          <Button variant="ghost" size="icon" aria-label="Editar processo" asChild>
+            <Link to="/processos/editar/$processoId" params={{ processoId: processo.id }}>
+              <Pencil className="h-4 w-4" />
+            </Link>
+          </Button>
           <Button
             variant="ghost"
             size="icon"
-            aria-label="Editar processo"
-            onClick={() => onEditar(processo)}
+            aria-label={
+              podeExcluir ? "Excluir processo" : "Exclusão permitida apenas a advogados"
+            }
+            title={
+              podeExcluir
+                ? "Excluir processo"
+                : "Somente advogados podem excluir processos"
+            }
+            className={cn(!podeExcluir && "opacity-50")}
+            onClick={() =>
+              podeExcluir
+                ? onExcluir(processo)
+                : toast.error("Exclusão não permitida", {
+                    description:
+                      "Somente advogados podem excluir processos. Peça a um advogado do escritório.",
+                  })
+            }
           >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          {podeExcluir ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Excluir processo"
-              onClick={() => onExcluir(processo)}
-            >
+            {podeExcluir ? (
               <Trash2 className="h-4 w-4 text-destructive" />
-            </Button>
-          ) : null}
+            ) : (
+              <Lock className="h-4 w-4 text-muted-foreground" />
+            )}
+          </Button>
         </div>
       </div>
 

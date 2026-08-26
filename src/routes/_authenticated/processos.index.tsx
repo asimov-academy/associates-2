@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
@@ -10,7 +10,6 @@ import { FASES, TIPOS_PROCESSO, type Processo } from "@/lib/domain";
 import { useEhAdvogado } from "@/hooks/useSessao";
 import { AppShell } from "@/components/AppShell";
 import { ProcessoCard } from "@/components/ProcessoCard";
-import { ProcessoDialog } from "@/components/ProcessoDialog";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -45,8 +44,6 @@ export const Route = createFileRoute("/_authenticated/processos/")({
 function ProcessosPage() {
   const queryClient = useQueryClient();
   const ehAdvogado = useEhAdvogado();
-  const [dialogAberto, setDialogAberto] = useState(false);
-  const [emEdicao, setEmEdicao] = useState<Processo | null>(null);
   const [situacao, setSituacao] = useState("todos");
   const [tipo, setTipo] = useState("todos");
   const [fase, setFase] = useState("todas");
@@ -85,13 +82,10 @@ function ProcessosPage() {
       titulo="Processos"
       descricao="Histórico completo de todos os processos do escritório."
       acoes={
-        <Button
-          onClick={() => {
-            setEmEdicao(null);
-            setDialogAberto(true);
-          }}
-        >
-          <Plus className="mr-2 h-4 w-4" /> Novo processo
+        <Button asChild>
+          <Link to="/processos/novo">
+            <Plus className="mr-2 h-4 w-4" /> Novo processo
+          </Link>
         </Button>
       }
     >
@@ -137,17 +131,11 @@ function ProcessosPage() {
               key={p.id}
               processo={p}
               podeExcluir={ehAdvogado}
-              onEditar={(proc) => {
-                setEmEdicao(proc);
-                setDialogAberto(true);
-              }}
               onExcluir={excluir}
             />
           ))
         )}
       </div>
-
-      <ProcessoDialog aberto={dialogAberto} processo={emEdicao} onOpenChange={setDialogAberto} />
     </AppShell>
   );
 }

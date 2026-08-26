@@ -18,6 +18,8 @@ import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedProcessosIndexRouteImport } from './routes/_authenticated/processos.index'
 import { Route as AuthenticatedProcessosProcessoIdRouteImport } from './routes/_authenticated/processos.$processoId'
+import { Route as AuthenticatedProcessosNovoRouteImport } from './routes/_authenticated/processos.novo'
+import { Route as AuthenticatedProcessosEditarProcessoIdRouteImport } from './routes/_authenticated/processos.editar.$processoId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -65,6 +67,18 @@ const AuthenticatedProcessosProcessoIdRoute =
     path: '/processos/$processoId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProcessosNovoRoute =
+  AuthenticatedProcessosNovoRouteImport.update({
+    id: '/processos/novo',
+    path: '/processos/novo',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProcessosEditarProcessoIdRoute =
+  AuthenticatedProcessosEditarProcessoIdRouteImport.update({
+    id: '/processos/editar/$processoId',
+    path: '/processos/editar/$processoId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -74,7 +88,9 @@ export interface FileRoutesByFullPath {
   '/clientes': typeof AuthenticatedClientesRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/processos/$processoId': typeof AuthenticatedProcessosProcessoIdRoute
+  '/processos/novo': typeof AuthenticatedProcessosNovoRoute
   '/processos/': typeof AuthenticatedProcessosIndexRoute
+  '/processos/editar/$processoId': typeof AuthenticatedProcessosEditarProcessoIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -84,7 +100,9 @@ export interface FileRoutesByTo {
   '/clientes': typeof AuthenticatedClientesRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/processos/$processoId': typeof AuthenticatedProcessosProcessoIdRoute
+  '/processos/novo': typeof AuthenticatedProcessosNovoRoute
   '/processos': typeof AuthenticatedProcessosIndexRoute
+  '/processos/editar/$processoId': typeof AuthenticatedProcessosEditarProcessoIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -96,7 +114,9 @@ export interface FileRoutesById {
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/processos/$processoId': typeof AuthenticatedProcessosProcessoIdRoute
+  '/_authenticated/processos/novo': typeof AuthenticatedProcessosNovoRoute
   '/_authenticated/processos/': typeof AuthenticatedProcessosIndexRoute
+  '/_authenticated/processos/editar/$processoId': typeof AuthenticatedProcessosEditarProcessoIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -108,7 +128,9 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/painel'
     | '/processos/$processoId'
+    | '/processos/novo'
     | '/processos/'
+    | '/processos/editar/$processoId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -118,7 +140,9 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/painel'
     | '/processos/$processoId'
+    | '/processos/novo'
     | '/processos'
+    | '/processos/editar/$processoId'
   id:
     | '__root__'
     | '/'
@@ -129,7 +153,9 @@ export interface FileRouteTypes {
     | '/_authenticated/clientes'
     | '/_authenticated/painel'
     | '/_authenticated/processos/$processoId'
+    | '/_authenticated/processos/novo'
     | '/_authenticated/processos/'
+    | '/_authenticated/processos/editar/$processoId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -203,6 +229,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProcessosProcessoIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/processos/novo': {
+      id: '/_authenticated/processos/novo'
+      path: '/processos/novo'
+      fullPath: '/processos/novo'
+      preLoaderRoute: typeof AuthenticatedProcessosNovoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/processos/editar/$processoId': {
+      id: '/_authenticated/processos/editar/$processoId'
+      path: '/processos/editar/$processoId'
+      fullPath: '/processos/editar/$processoId'
+      preLoaderRoute: typeof AuthenticatedProcessosEditarProcessoIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -212,7 +252,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedProcessosProcessoIdRoute: typeof AuthenticatedProcessosProcessoIdRoute
+  AuthenticatedProcessosNovoRoute: typeof AuthenticatedProcessosNovoRoute
   AuthenticatedProcessosIndexRoute: typeof AuthenticatedProcessosIndexRoute
+  AuthenticatedProcessosEditarProcessoIdRoute: typeof AuthenticatedProcessosEditarProcessoIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -221,7 +263,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedProcessosProcessoIdRoute: AuthenticatedProcessosProcessoIdRoute,
+  AuthenticatedProcessosNovoRoute: AuthenticatedProcessosNovoRoute,
   AuthenticatedProcessosIndexRoute: AuthenticatedProcessosIndexRoute,
+  AuthenticatedProcessosEditarProcessoIdRoute:
+    AuthenticatedProcessosEditarProcessoIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

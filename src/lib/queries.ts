@@ -1,5 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { Anexo, Cliente, Movimentacao, Processo, Profile } from "@/lib/domain";
+import type {
+  Anexo,
+  Cliente,
+  HistoricoMovimentacao,
+  Movimentacao,
+  Processo,
+  Profile,
+} from "@/lib/domain";
 
 const PROCESSO_SELECT =
   "*, processo_clientes(clientes(*)), processo_advogados(profiles(*))";
@@ -118,4 +125,16 @@ export async function removerAnexo(anexo: Anexo) {
   const { error } = await supabase.from("anexos").delete().eq("id", anexo.id);
   if (error) throw error;
   await supabase.storage.from("anexos").remove([anexo.storage_path]);
+}
+
+export async function listarHistoricoDoProcesso(
+  processoId: string,
+): Promise<HistoricoMovimentacao[]> {
+  const { data, error } = await supabase
+    .from("movimentacao_historico")
+    .select("*, alterado_por:alterado_por_id(nome)")
+    .eq("processo_id", processoId)
+    .order("alterado_em", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as unknown as HistoricoMovimentacao[];
 }

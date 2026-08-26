@@ -98,6 +98,17 @@ export interface Movimentacao {
   alterado_por?: { nome: string } | null;
 }
 
+export interface HistoricoMovimentacao {
+  id: string;
+  movimentacao_id: string;
+  data_anterior: string | null;
+  data_nova: string | null;
+  descricao_anterior: string | null;
+  descricao_nova: string | null;
+  alterado_em: string;
+  alterado_por?: { nome: string } | null;
+}
+
 export interface Anexo {
   id: string;
   processo_id: string | null;
@@ -160,4 +171,18 @@ export function formatarCpf(cpf: string): string {
 export function resultadoProcesso(p: { concluido: boolean; vencido: boolean }): string {
   if (!p.concluido) return "Em andamento";
   return p.vencido ? "Perdido" : "Vencido";
+}
+
+/** Mantém apenas dígitos do CPF (máx. 11). */
+export function normalizarCpf(valor: string): string {
+  return valor.replace(/\D/g, "").slice(0, 11);
+}
+
+/** Aplica a máscara 000.000.000-00 progressivamente enquanto o usuário digita. */
+export function mascararCpf(valor: string): string {
+  const d = normalizarCpf(valor);
+  if (d.length <= 3) return d;
+  if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`;
+  if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`;
+  return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
 }
