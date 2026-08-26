@@ -368,6 +368,7 @@ function LinhaDoTempo({
         ) : (
           movimentacoes.map((m) => {
             const doItem = anexos.filter((a) => a.movimentacao_id === m.id);
+            const versoes = historico.filter((h) => h.movimentacao_id === m.id);
             return (
               <li key={m.id} className="relative">
                 <span className="absolute top-1.5 -left-[29px] h-2.5 w-2.5 rounded-full bg-primary" />
@@ -381,27 +382,47 @@ function LinhaDoTempo({
                       onClick={() => {
                         setEditandoId(m.id);
                         setTextoEdicao(m.descricao);
+                        setDataEdicao(m.data);
                       }}
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
-                    {podeExcluir ? (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Excluir movimentação"
-                        onClick={() => excluir(m.id)}
-                      >
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={
+                        podeExcluir
+                          ? "Excluir movimentação"
+                          : "Exclusão permitida apenas a advogados"
+                      }
+                      title={
+                        podeExcluir
+                          ? "Excluir movimentação"
+                          : "Somente advogados podem excluir movimentações"
+                      }
+                      className={podeExcluir ? undefined : "opacity-50"}
+                      onClick={() => excluir(m.id)}
+                    >
+                      {podeExcluir ? (
                         <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                      </Button>
-                    ) : null}
+                      ) : (
+                        <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+                      )}
+                    </Button>
                   </div>
                 </div>
 
                 {editandoId === m.id ? (
                   <div className="mt-2 space-y-2">
+                    <Input
+                      type="date"
+                      className="w-44"
+                      value={dataEdicao}
+                      onChange={(e) => setDataEdicao(e.target.value)}
+                    />
                     <Textarea
                       rows={3}
+                      maxLength={2000}
                       value={textoEdicao}
                       onChange={(e) => setTextoEdicao(e.target.value)}
                     />
@@ -424,6 +445,39 @@ function LinhaDoTempo({
                     ? ` · editado por ${m.alterado_por?.nome ?? "—"} em ${formatarDataHora(m.alterado_em)}`
                     : ""}
                 </p>
+
+                {versoes.length > 0 ? (
+                  <details className="mt-2 rounded-md border border-border bg-muted/30 px-3 py-2">
+                    <summary className="flex cursor-pointer items-center gap-2 text-xs font-medium text-muted-foreground">
+                      <History className="h-3.5 w-3.5" />
+                      Histórico de alterações ({versoes.length})
+                    </summary>
+                    <ul className="mt-2 space-y-3">
+                      {versoes.map((h) => (
+                        <li key={h.id} className="border-l-2 border-border pl-3 text-xs">
+                          <p className="font-medium">
+                            {h.alterado_por?.nome ?? "—"} · {formatarDataHora(h.alterado_em)}
+                          </p>
+                          {h.data_anterior !== h.data_nova ? (
+                            <p className="mt-1 text-muted-foreground">
+                              Data: {formatarData(h.data_anterior)} → {formatarData(h.data_nova)}
+                            </p>
+                          ) : null}
+                          {h.descricao_anterior !== h.descricao_nova ? (
+                            <>
+                              <p className="mt-1 text-muted-foreground">Texto anterior:</p>
+                              <p className="whitespace-pre-line text-muted-foreground line-through">
+                                {h.descricao_anterior ?? "—"}
+                              </p>
+                              <p className="mt-1 text-muted-foreground">Texto novo:</p>
+                              <p className="whitespace-pre-line">{h.descricao_nova ?? "—"}</p>
+                            </>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : null}
 
                 <AnexosLinha
                   anexos={doItem}
