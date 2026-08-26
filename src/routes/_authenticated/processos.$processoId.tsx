@@ -178,11 +178,28 @@ function DetalheProcesso() {
           <Button variant="outline" onClick={() => navigate({ to: "/processos" })}>
             <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
           </Button>
-          <Button variant="outline" asChild>
-            <Link to="/processos/editar/$processoId" params={{ processoId }}>
-              <Pencil className="mr-2 h-4 w-4" /> Editar
-            </Link>
+          <Button variant="outline" onClick={baixarPdf}>
+            <FileDown className="mr-2 h-4 w-4" /> Baixar PDF
           </Button>
+          {ehAdvogado ? (
+            <Button variant="outline" asChild>
+              <Link to="/processos/editar/$processoId" params={{ processoId }}>
+                <Pencil className="mr-2 h-4 w-4" /> Editar
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              title="Somente advogados podem editar processos"
+              onClick={() =>
+                toast.error("Edição não permitida", {
+                  description: "A secretaria tem acesso somente para consulta.",
+                })
+              }
+            >
+              <Lock className="mr-2 h-4 w-4" /> Editar
+            </Button>
+          )}
           <Button
             variant={ehAdvogado ? "destructive" : "outline"}
             onClick={excluirProcesso}
@@ -250,16 +267,18 @@ function DetalheProcesso() {
             historico={historico}
             anexos={anexosMov}
             autorId={perfil?.id ?? null}
-            podeExcluir={ehAdvogado}
+            podeEditar={ehAdvogado}
             onMudou={invalidarTudo}
           />
+
+          <HistoricoDoProcesso registros={historicoProcesso} />
         </div>
 
         <PainelAnexos
           anexos={anexosProcesso}
           processoId={processoId}
           autorId={perfil?.id ?? null}
-          podeExcluir={ehAdvogado}
+          podeEditar={ehAdvogado}
           onMudou={invalidarTudo}
         />
       </div>
@@ -282,7 +301,7 @@ function LinhaDoTempo({
   historico,
   anexos,
   autorId,
-  podeExcluir,
+  podeEditar,
   onMudou,
 }: {
   processoId: string;
@@ -290,7 +309,7 @@ function LinhaDoTempo({
   historico: HistoricoMovimentacao[];
   anexos: Anexo[];
   autorId: string | null;
-  podeExcluir: boolean;
+  podeEditar: boolean;
   onMudou: () => void;
 }) {
   const [data, setData] = useState(new Date().toISOString().slice(0, 10));
@@ -347,7 +366,7 @@ function LinhaDoTempo({
   }
 
   async function excluir(id: string) {
-    if (!podeExcluir) {
+    if (!podeEditar) {
       toast.error("Exclusão não permitida", {
         description: "Somente advogados podem excluir movimentações.",
       });
@@ -372,30 +391,37 @@ function LinhaDoTempo({
         alteração, a data/hora e o conteúdo anterior.
       </p>
 
-      <form onSubmit={registrar} className="mt-4 space-y-3 rounded-md bg-muted/40 p-4">
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="space-y-1">
-            <Label htmlFor="mov-data">Data</Label>
-            <Input
-              id="mov-data"
-              type="date"
-              value={data}
-              onChange={(e) => setData(e.target.value)}
-              className="w-44"
-            />
+      {podeEditar ? (
+        <form onSubmit={registrar} className="mt-4 space-y-3 rounded-md bg-muted/40 p-4">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="mov-data">Data</Label>
+              <Input
+                id="mov-data"
+                type="date"
+                value={data}
+                onChange={(e) => setData(e.target.value)}
+                className="w-44"
+              />
+            </div>
           </div>
-        </div>
-        <Textarea
-          rows={3}
-          maxLength={2000}
-          placeholder="Descreva a movimentação do processo…"
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
-        />
-        <Button type="submit" size="sm" disabled={salvando}>
-          Registrar movimentação
-        </Button>
-      </form>
+          <Textarea
+            rows={3}
+            maxLength={2000}
+            placeholder="Descreva a movimentação do processo…"
+            value={descricao}
+            onChange={(e) => setDescricao(e.target.value)}
+          />
+          <Button type="submit" size="sm" disabled={salvando}>
+            Registrar movimentação
+          </Button>
+        </form>
+      ) : (
+        <p className="mt-4 flex items-center gap-2 rounded-md bg-muted/40 p-4 text-sm text-muted-foreground">
+          <Lock className="h-4 w-4" /> Acesso somente para consulta: a secretaria não registra nem
+          edita movimentações.
+        </p>
+      )}
 
       <ol className="mt-6 space-y-5 border-l border-border pl-6">
         {movimentacoes.length === 0 ? (
@@ -411,42 +437,31 @@ function LinhaDoTempo({
                 <span className="absolute top-1.5 -left-[29px] h-2.5 w-2.5 rounded-full bg-primary" />
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-sm font-medium">{formatarData(m.data)}</p>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Editar movimentação"
-                      onClick={() => {
-                        setEditandoId(m.id);
-                        setTextoEdicao(m.descricao);
-                        setDataEdicao(m.data);
-                      }}
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label={
-                        podeExcluir
-                          ? "Excluir movimentação"
-                          : "Exclusão permitida apenas a advogados"
-                      }
-                      title={
-                        podeExcluir
-                          ? "Excluir movimentação"
-                          : "Somente advogados podem excluir movimentações"
-                      }
-                      className={podeExcluir ? undefined : "opacity-50"}
-                      onClick={() => excluir(m.id)}
-                    >
-                      {podeExcluir ? (
+                  {podeEditar ? (
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Editar movimentação"
+                        onClick={() => {
+                          setEditandoId(m.id);
+                          setTextoEdicao(m.descricao);
+                          setDataEdicao(m.data);
+                        }}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Excluir movimentação"
+                        title="Excluir movimentação"
+                        onClick={() => excluir(m.id)}
+                      >
                         <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                      ) : (
-                        <Lock className="h-3.5 w-3.5 text-muted-foreground" />
-                      )}
-                    </Button>
-                  </div>
+                      </Button>
+                    </div>
+                  ) : null}
                 </div>
 
                 {editandoId === m.id ? (
@@ -518,11 +533,12 @@ function LinhaDoTempo({
 
                 <AnexosLinha
                   anexos={doItem}
-                  podeExcluir={podeExcluir}
+                  podeEditar={podeEditar}
                   onMudou={onMudou}
                   movimentacaoId={m.id}
                   autorId={autorId}
                 />
+
               </li>
             );
           })
@@ -536,13 +552,13 @@ function AnexosLinha({
   anexos,
   movimentacaoId,
   autorId,
-  podeExcluir,
+  podeEditar,
   onMudou,
 }: {
   anexos: Anexo[];
   movimentacaoId: string;
   autorId: string | null;
-  podeExcluir: boolean;
+  podeEditar: boolean;
   onMudou: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -562,25 +578,29 @@ function AnexosLinha({
   return (
     <div className="mt-2 space-y-1">
       {anexos.map((a) => (
-        <ItemAnexo key={a.id} anexo={a} podeExcluir={podeExcluir} onMudou={onMudou} />
+        <ItemAnexo key={a.id} anexo={a} podeExcluir={podeEditar} onMudou={onMudou} />
       ))}
-      <input
-        ref={inputRef}
-        type="file"
-        className="hidden"
-        onChange={(e) => {
-          const arquivo = e.target.files?.[0];
-          if (arquivo) void enviar(arquivo);
-          e.target.value = "";
-        }}
-      />
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-      >
-        <Paperclip className="h-3 w-3" /> Anexar documento
-      </button>
+      {podeEditar ? (
+        <>
+          <input
+            ref={inputRef}
+            type="file"
+            className="hidden"
+            onChange={(e) => {
+              const arquivo = e.target.files?.[0];
+              if (arquivo) void enviar(arquivo);
+              e.target.value = "";
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+          >
+            <Paperclip className="h-3 w-3" /> Anexar documento
+          </button>
+        </>
+      ) : null}
     </div>
   );
 }
@@ -637,13 +657,13 @@ function PainelAnexos({
   anexos,
   processoId,
   autorId,
-  podeExcluir,
+  podeEditar,
   onMudou,
 }: {
   anexos: Anexo[];
   processoId: string;
   autorId: string | null;
-  podeExcluir: boolean;
+  podeEditar: boolean;
   onMudou: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -672,29 +692,83 @@ function PainelAnexos({
           <p className="text-sm text-muted-foreground">Nenhum documento anexado.</p>
         ) : (
           anexos.map((a) => (
-            <ItemAnexo key={a.id} anexo={a} podeExcluir={podeExcluir} onMudou={onMudou} />
+            <ItemAnexo key={a.id} anexo={a} podeExcluir={podeEditar} onMudou={onMudou} />
           ))
         )}
       </div>
-      <input
-        ref={inputRef}
-        type="file"
-        className="hidden"
-        onChange={(e) => {
-          const arquivo = e.target.files?.[0];
-          if (arquivo) void enviar(arquivo);
-          e.target.value = "";
-        }}
-      />
-      <Button
-        variant="outline"
-        size="sm"
-        className="mt-4 w-full"
-        disabled={enviando}
-        onClick={() => inputRef.current?.click()}
-      >
-        <Upload className="mr-2 h-4 w-4" /> Anexar documento
-      </Button>
+      {podeEditar ? (
+        <>
+          <input
+            ref={inputRef}
+            type="file"
+            className="hidden"
+            onChange={(e) => {
+              const arquivo = e.target.files?.[0];
+              if (arquivo) void enviar(arquivo);
+              e.target.value = "";
+            }}
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-4 w-full"
+            disabled={enviando}
+            onClick={() => inputRef.current?.click()}
+          >
+            <Upload className="mr-2 h-4 w-4" /> Anexar documento
+          </Button>
+        </>
+      ) : (
+        <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+          <Lock className="h-3.5 w-3.5" /> Somente advogados podem anexar ou excluir documentos.
+        </p>
+      )}
     </aside>
+  );
+}
+
+function HistoricoDoProcesso({ registros }: { registros: HistoricoProcesso[] }) {
+  return (
+    <section className="rounded-lg border border-border bg-card p-6">
+      <h2 className="flex items-center gap-2 font-serif text-lg font-semibold">
+        <History className="h-4 w-4" /> Histórico do processo
+      </h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Toda alteração nos dados do processo e nos documentos fica registrada com autor e
+        data/hora.
+      </p>
+
+      {registros.length === 0 ? (
+        <p className="mt-4 text-sm text-muted-foreground">Nenhuma alteração registrada até agora.</p>
+      ) : (
+        <ul className="mt-4 space-y-3">
+          {registros.map((r) => (
+            <li key={r.id} className="rounded-md border border-border px-3 py-2 text-sm">
+              <p className="text-xs text-muted-foreground">
+                {r.alterado_por?.nome ?? "—"} · {formatarDataHora(r.alterado_em)}
+              </p>
+              {r.entidade === "anexo" ? (
+                <p className="mt-1">
+                  {r.acao === "criacao" ? "Documento anexado" : "Documento removido"}:{" "}
+                  <span className="font-medium">{r.valor_novo ?? r.valor_anterior ?? "—"}</span>
+                </p>
+              ) : r.acao === "criacao" ? (
+                <p className="mt-1">Processo cadastrado</p>
+              ) : (
+                <p className="mt-1">
+                  <span className="font-medium">
+                    {ROTULOS_CAMPO_PROCESSO[r.campo ?? ""] ?? r.campo}
+                  </span>
+                  : <span className="line-through text-muted-foreground">
+                    {formatarValorHistorico(r.campo, r.valor_anterior)}
+                  </span>{" "}
+                  → {formatarValorHistorico(r.campo, r.valor_novo)}
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
