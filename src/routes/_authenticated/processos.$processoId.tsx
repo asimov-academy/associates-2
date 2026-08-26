@@ -178,11 +178,28 @@ function DetalheProcesso() {
           <Button variant="outline" onClick={() => navigate({ to: "/processos" })}>
             <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
           </Button>
-          <Button variant="outline" asChild>
-            <Link to="/processos/editar/$processoId" params={{ processoId }}>
-              <Pencil className="mr-2 h-4 w-4" /> Editar
-            </Link>
+          <Button variant="outline" onClick={baixarPdf}>
+            <FileDown className="mr-2 h-4 w-4" /> Baixar PDF
           </Button>
+          {ehAdvogado ? (
+            <Button variant="outline" asChild>
+              <Link to="/processos/editar/$processoId" params={{ processoId }}>
+                <Pencil className="mr-2 h-4 w-4" /> Editar
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              title="Somente advogados podem editar processos"
+              onClick={() =>
+                toast.error("Edição não permitida", {
+                  description: "A secretaria tem acesso somente para consulta.",
+                })
+              }
+            >
+              <Lock className="mr-2 h-4 w-4" /> Editar
+            </Button>
+          )}
           <Button
             variant={ehAdvogado ? "destructive" : "outline"}
             onClick={excluirProcesso}
