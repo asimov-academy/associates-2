@@ -267,16 +267,18 @@ function DetalheProcesso() {
             historico={historico}
             anexos={anexosMov}
             autorId={perfil?.id ?? null}
-            podeExcluir={ehAdvogado}
+            podeEditar={ehAdvogado}
             onMudou={invalidarTudo}
           />
+
+          <HistoricoDoProcesso registros={historicoProcesso} />
         </div>
 
         <PainelAnexos
           anexos={anexosProcesso}
           processoId={processoId}
           autorId={perfil?.id ?? null}
-          podeExcluir={ehAdvogado}
+          podeEditar={ehAdvogado}
           onMudou={invalidarTudo}
         />
       </div>
