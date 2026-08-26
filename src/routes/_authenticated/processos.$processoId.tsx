@@ -284,10 +284,16 @@ function LinhaDoTempo({
   }
 
   async function salvarEdicao(id: string) {
+    const texto = textoEdicao.trim();
+    if (!texto) {
+      toast.error("A descrição não pode ficar vazia");
+      return;
+    }
     const { error } = await supabase
       .from("movimentacoes")
       .update({
-        descricao: textoEdicao.trim(),
+        descricao: texto,
+        data: dataEdicao,
         alterado_por_id: autorId,
         alterado_em: new Date().toISOString(),
       })
@@ -298,10 +304,18 @@ function LinhaDoTempo({
     }
     setEditandoId(null);
     onMudou();
-    toast.success("Movimentação atualizada");
+    toast.success("Movimentação atualizada", {
+      description: "A versão anterior foi guardada no histórico de alterações.",
+    });
   }
 
   async function excluir(id: string) {
+    if (!podeExcluir) {
+      toast.error("Exclusão não permitida", {
+        description: "Somente advogados podem excluir movimentações.",
+      });
+      return;
+    }
     if (!window.confirm("Excluir esta movimentação?")) return;
     const { error } = await supabase.from("movimentacoes").delete().eq("id", id);
     if (error) {
@@ -311,6 +325,7 @@ function LinhaDoTempo({
     onMudou();
     toast.success("Movimentação excluída");
   }
+
 
   return (
     <section className="rounded-lg border border-border bg-card p-6">
