@@ -301,7 +301,7 @@ function LinhaDoTempo({
   historico,
   anexos,
   autorId,
-  podeExcluir,
+  podeEditar,
   onMudou,
 }: {
   processoId: string;
@@ -309,7 +309,7 @@ function LinhaDoTempo({
   historico: HistoricoMovimentacao[];
   anexos: Anexo[];
   autorId: string | null;
-  podeExcluir: boolean;
+  podeEditar: boolean;
   onMudou: () => void;
 }) {
   const [data, setData] = useState(new Date().toISOString().slice(0, 10));
