@@ -435,7 +435,13 @@ function Obrigatorio() {
   );
 }
 
-function Mensagem({ erro, children }: { erro?: string; children?: React.ReactNode }) {
+function Mensagem({
+  erro,
+  children,
+}: {
+  erro?: string | undefined;
+  children?: React.ReactNode | undefined;
+}) {
   if (erro) return <p className="text-xs text-destructive">{erro}</p>;
   if (children) return <p className="text-xs text-muted-foreground">{children}</p>;
   return null;
@@ -452,8 +458,8 @@ function CampoSelect({
   label: string;
   valor: string;
   opcoes: readonly string[];
-  erro?: string;
-  obrigatorio?: boolean;
+  erro?: string | undefined;
+  obrigatorio?: boolean | undefined;
   onChange: (v: string) => void;
 }) {
   return (
@@ -491,8 +497,8 @@ function ListaSelecao({
   vazio: string;
   itens: { id: string; rotulo: string; apoio?: string }[];
   selecionados: string[];
-  erro?: string;
-  obrigatorio?: boolean;
+  erro?: string | undefined;
+  obrigatorio?: boolean | undefined;
   onToggle: (id: string) => void;
 }) {
   return (
