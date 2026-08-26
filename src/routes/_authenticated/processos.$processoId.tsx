@@ -366,7 +366,7 @@ function LinhaDoTempo({
   }
 
   async function excluir(id: string) {
-    if (!podeExcluir) {
+    if (!podeEditar) {
       toast.error("Exclusão não permitida", {
         description: "Somente advogados podem excluir movimentações.",
       });
